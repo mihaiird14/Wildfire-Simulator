@@ -21,8 +21,6 @@ public class CameraController : MonoBehaviour
 
     void Awake()
     {
-        // Awake ruleaza inaintea oricarui alt script
-        // Gasim centrul terenului si pozitionam camera imediat
         if (Terrain.activeTerrain != null)
         {
             TerrainData td = Terrain.activeTerrain.terrainData;
@@ -36,13 +34,12 @@ public class CameraController : MonoBehaviour
             _target = new Vector3(100f, 0f, 100f);
         }
 
-        // Pozitionam camera imediat in Awake ca sa nu existe niciun frame gresit
         UpdateCameraPosition();
     }
 
     void Start()
     {
-        // Repetam in Start ca sa fim siguri
+
         UpdateCameraPosition();
     }
 

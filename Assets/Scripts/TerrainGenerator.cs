@@ -4,23 +4,20 @@ using UnityEngine;
 public class TerrainGenerator : MonoBehaviour
 {
     [Header("Dimensiuni teren")]
-    public int terrainWidth = 1000;  // marit la 1000 pentru spatiu mai mare
+    public int terrainWidth = 1000; 
     public int terrainLength = 1000;
-    public int terrainHeight = 300;   // inaltime maxima mare, dar doar in varfuri
+    public int terrainHeight = 300;  
     public int heightmapRes = 513;
 
     [Header("Relief")]
-    // Scale foarte mic = forme FOARTE mari si rare = vai largi, dealuri rare
-    public float baseScale = 0.0008f;  // forma generala - vai si campii largi
-    public float midScale = 0.003f;   // dealuri de marime medie, rare
-    public float detailScale = 0.008f;   // mici denivelari
+    public float baseScale = 0.0008f; 
+    public float midScale = 0.003f;  
+    public float detailScale = 0.008f;  
 
-    public float baseWeight = 0.70f;   // forma generala domina
+    public float baseWeight = 0.70f; 
     public float midWeight = 0.22f;
-    public float detailWeight = 0.08f;   // detalii fine, minime
+    public float detailWeight = 0.08f; 
 
-    // Putere mare = majoritatea terenului e JOS (campie), doar varfurile sunt inalte
-    // 3.0 = ~80% din teren e campie, doar 20% are relief inalt
     public float heightCurve = 3.0f;
 
     public int seed = 42;
@@ -62,7 +59,6 @@ public class TerrainGenerator : MonoBehaviour
             ApplyTextures(heights);
 
         BuildVegetationGrid(heights);
-        // Anuntam GridRenderer ca e gata
         GridRenderer gr = GetComponent<GridRenderer>();
         if (gr != null)
             gr.DrawGrid();
@@ -111,10 +107,10 @@ public class TerrainGenerator : MonoBehaviour
     void ApplyTextures(float[,] heights)
     {
         TerrainLayer[] layers = new TerrainLayer[4];
-        layers[0] = MakeLayer(grassTexture, new Vector2(8, 8));   // era 40
-        layers[1] = MakeLayer(shrubTexture, new Vector2(8, 8));   // era 35
-        layers[2] = MakeLayer(forestTexture, new Vector2(8, 8));   // era 40
-        layers[3] = MakeLayer(rockTexture, new Vector2(5, 5));   // era 20
+        layers[0] = MakeLayer(grassTexture, new Vector2(8, 8)); 
+        layers[1] = MakeLayer(shrubTexture, new Vector2(8, 8));  
+        layers[2] = MakeLayer(forestTexture, new Vector2(8, 8));  
+        layers[3] = MakeLayer(rockTexture, new Vector2(5, 5)); 
         _data.terrainLayers = layers;
 
         int res = _data.alphamapResolution;
@@ -206,7 +202,6 @@ public class TerrainGenerator : MonoBehaviour
                 float nx = (float)x / res * 4f;
                 float nz = (float)z / res * 4f;
 
-                // Noise complet independent de inaltime
                 float v = Mathf.PerlinNoise(nx + ox, nz + oz);
                 v += Mathf.PerlinNoise(nx * 2f + ox, nz * 2f + oz) * 0.5f;
                 v /= 1.5f;

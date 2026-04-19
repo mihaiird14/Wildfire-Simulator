@@ -3,35 +3,40 @@ using UnityEngine;
 public class GridRenderer : MonoBehaviour
 {
     public TerrainGenerator terrainGen;
-    public int gridSize = 513;
 
     private Texture2D _gridTex;
     private GameObject _quad;
 
     void Start()
     {
-        // Asteptam un frame ca TerrainGenerator sa termine in Start()
-        Invoke("DrawGrid", 0.5f);
+        StartCoroutine(InitAfterTerrain());
     }
 
-    public void DrawGrid()
+    System.Collections.IEnumerator InitAfterTerrain()
     {
-        if (terrainGen == null || terrainGen.vegetationGrid == null)
-        {
-            Debug.LogError("[GridRenderer] vegetationGrid e null!");
-            return;
-        }
+        yield return new WaitForSeconds(0.6f);
+        DrawGrid();
+    }
 
-        // Citim dimensiunea reala din grid, nu din Inspector
+    public void DrawGrid(CellState[,] states = null)
+    {
+        if (terrainGen == null || terrainGen.vegetationGrid == null) return;
+
         int size = terrainGen.vegetationGrid.GetLength(0);
 
-        _gridTex = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        _gridTex.filterMode = FilterMode.Point;
+        if (_gridTex == null || _gridTex.width != size)
+            _gridTex = new Texture2D(size, size, TextureFormat.RGBA32, false);
 
         for (int z = 0; z < size; z++)
             for (int x = 0; x < size; x++)
             {
-                Color c = GetVegColor(terrainGen.vegetationGrid[z, x]);
+                Color c;
+                if (states != null && states[z, x] == CellState.Burning)
+                    c = new Color(1f, 0.3f, 0f);
+                else if (states != null && states[z, x] == CellState.Burned)
+                    c = new Color(0.1f, 0.1f, 0.1f);
+                else
+                    c = GetVegColor(terrainGen.vegetationGrid[z, x]);
                 _gridTex.SetPixel(x, z, c);
             }
 
@@ -49,9 +54,8 @@ public class GridRenderer : MonoBehaviour
         var mat = new Material(Shader.Find("Unlit/Texture"));
         mat.mainTexture = _gridTex;
         _quad.GetComponent<Renderer>().material = mat;
-
-        Debug.Log("[GridRenderer] Grid desenat: " + size + "x" + size);
     }
+
     Color GetVegColor(VegetationType type)
     {
         return type switch
