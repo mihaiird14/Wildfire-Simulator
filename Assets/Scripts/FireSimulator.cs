@@ -10,8 +10,9 @@ public class FireSimulator : MonoBehaviour
     public float windZ = 0f;
     public float windStrength = 0.3f;
     public float simSpeed = 0.2f;
-
+    public float globalMoisture = 0.1f;
     private CellState[,] _states;
+    public CellState[,] States => _states;
     private float[,] _burnTimer;
     private int _res;
     private float _timer;
@@ -35,30 +36,7 @@ public class FireSimulator : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 mousePos = Input.mousePosition;
-
-            // Dimensiunea ecranului
-            float screenW = Screen.width;
-            float screenH = Screen.height;
-
-            // Fractia pe ecran (0-1)
-            float fx = mousePos.x / screenW;
-            float fy = mousePos.y / screenH;
-
-            // Coordonate grid
-            int gx = Mathf.Clamp(Mathf.RoundToInt(fx * (_res - 1)), 0, _res - 1);
-            int gz = Mathf.Clamp(Mathf.RoundToInt(fy * (_res - 1)), 0, _res - 1);
-
-            Debug.Log("fx=" + fx + " fy=" + fy + " gx=" + gx + " gz=" + gz);
-
-            if (_states != null && _states[gz, gx] == CellState.Unburned)
-            {
-                _states[gz, gx] = CellState.Burning;
-                _running = true;
-                Debug.Log("[FireSimulator] FOC PORNIT la (" + gx + ", " + gz + ")");
-            }
-        }
+            TryIgnite();
 
         if (!_running) return;
 
@@ -68,6 +46,40 @@ public class FireSimulator : MonoBehaviour
             _timer = 0f;
             SimulationTick();
             gridRenderer.DrawGrid(_states);
+        }
+    }
+
+    void TryIgnite()
+    {
+        if (_states == null) return;
+
+        Camera cam = null;
+        foreach (Camera c in Camera.allCameras)
+            if (c.gameObject.activeSelf) { cam = c; break; }
+        if (cam == null) return;
+
+        if (!cam.orthographic) return;
+
+        Vector3 mouseScreen = Input.mousePosition;
+        mouseScreen.z = cam.nearClipPlane;
+        Vector3 worldPos = cam.ScreenToWorldPoint(mouseScreen);
+
+        float terrainOriginX = terrainGen.transform.position.x;
+        float terrainOriginZ = terrainGen.transform.position.z;
+
+        float fx = (worldPos.x - terrainOriginX) / terrainGen.terrainWidth;
+        float fz = (worldPos.z - terrainOriginZ) / terrainGen.terrainLength;
+
+        if (fx < 0 || fx > 1 || fz < 0 || fz > 1) return;
+
+        int gx = Mathf.Clamp(Mathf.RoundToInt(fx * (_res - 1)), 0, _res - 1);
+        int gz = Mathf.Clamp(Mathf.RoundToInt(fz * (_res - 1)), 0, _res - 1);
+
+        if (_states[gz, gx] == CellState.Unburned)
+        {
+            _states[gz, gx] = CellState.Burning;
+            _running = true;
+            Debug.Log("[FireSimulator] FOC PORNIT la (" + gx + ", " + gz + ")");
         }
     }
 
@@ -87,6 +99,12 @@ public class FireSimulator : MonoBehaviour
                 if (_burnTimer[z, x] >= vd.burnDuration)
                     next[z, x] = CellState.Burned;
 
+                float myWx = terrainGen.transform.position.x
+                           + (float)x / (_res - 1) * terrainGen.terrainWidth;
+                float myWz = terrainGen.transform.position.z
+                           + (float)z / (_res - 1) * terrainGen.terrainLength;
+                float myHeight = terrainGen.GetNormalizedHeight(new Vector3(myWx, 0, myWz));
+
                 for (int dz = -1; dz <= 1; dz++)
                 {
                     for (int dx = -1; dx <= 1; dx++)
@@ -105,11 +123,24 @@ public class FireSimulator : MonoBehaviour
                             (dx * windX + dz * windZ) /
                             Mathf.Sqrt(dx * dx + dz * dz + 0.001f);
 
+                        float nWx = terrainGen.transform.position.x
+                                  + (float)nx / (_res - 1) * terrainGen.terrainWidth;
+                        float nWz = terrainGen.transform.position.z
+                                  + (float)nz / (_res - 1) * terrainGen.terrainLength;
+                        float neighborHeight = terrainGen.GetNormalizedHeight(
+                            new Vector3(nWx, 0, nWz));
+
+                        float heightDiff = neighborHeight - myHeight;
+                        float slopeFactor = Mathf.Clamp(1f + heightDiff * 5f, 0.3f, 2.5f);
+
+                        float moistureFactor = 1f - (globalMoisture * 0.8f);
+
                         float prob = nvd.ignitionChance
                                    * nvd.spreadMultiplier
                                    * windFactor
+                                   * slopeFactor
+                                   * moistureFactor
                                    * simSpeed;
-
                         if (Random.value < prob)
                             next[nz, nx] = CellState.Burning;
                     }
