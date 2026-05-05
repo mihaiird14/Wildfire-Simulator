@@ -1,18 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// ================================================================
-// FireStatistics.cs
-// ================================================================
-// Afiseaza in timp real:
-//   - Celule care ard acum
-//   - Celule total arse (%)
-//   - Viteza de propagare (celule/secunda)
-//   - Timp scurs de la pornirea focului
-//   - Grafic de propagare in timp
-//   - Parametrii actuali (vant, vegetatie dominanta)
-// ================================================================
-
 public class FireStatistics : MonoBehaviour
 {
     public FireSimulator fireSimulator;
@@ -141,9 +129,6 @@ public class FireStatistics : MonoBehaviour
         }
     }
 
-    // ================================================================
-    // GRAFIC — deseneaza istoricul propagarii
-    // ================================================================
     void UpdateGraph()
     {
         ClearGraph();
@@ -191,9 +176,6 @@ public class FireStatistics : MonoBehaviour
         _graphTex.Apply();
     }
 
-    // ================================================================
-    // UI — panou de statistici si grafic
-    // ================================================================
     void OnGUI()
     {
         if (!_fireStarted) return;
@@ -227,7 +209,6 @@ public class FireStatistics : MonoBehaviour
         valStyle.fontStyle = FontStyle.Bold;
         valStyle.alignment = TextAnchor.MiddleRight;
 
-        // ── TITLU ──────────────────────────────────────────────
         GUI.Label(new Rect(x, y, cw, 22f), "Statistici Incendiu", titleStyle);
         y += 26f;
 
@@ -237,7 +218,6 @@ public class FireStatistics : MonoBehaviour
         GUI.color = Color.white;
         y += 8f;
 
-        // ── DATE ───────────────────────────────────────────────
         float pctBurned = _totalCells > 0 ? (float)_totalBurned / _totalCells * 100f : 0f;
         float pctBurning = _totalCells > 0 ? (float)_currentBurning / _totalCells * 100f : 0f;
 
@@ -273,7 +253,6 @@ public class FireStatistics : MonoBehaviour
                  new Color(0.4f, 0.8f, 0.2f), lblStyle, valStyle);
         y += 26f;
 
-        // ── BARA PROGRES ───────────────────────────────────────
         GUI.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
         GUI.DrawTexture(new Rect(x, y, cw, 12f), Texture2D.whiteTexture);
         GUI.color = new Color(0.7f, 0.15f, 0.1f, 0.9f);
@@ -281,7 +260,6 @@ public class FireStatistics : MonoBehaviour
         GUI.color = Color.white;
         y += 18f;
 
-        // ── GRAFIC ─────────────────────────────────────────────
         GUIStyle smallLbl = new GUIStyle(GUI.skin.label);
         smallLbl.fontSize = 10;
         smallLbl.normal.textColor = new Color(0.7f, 0.7f, 0.7f);
@@ -305,9 +283,6 @@ public class FireStatistics : MonoBehaviour
         GUI.Label(new Rect(x + 104f, y + graphHeight, 80f, 16f), "Activ", smallLbl);
     }
 
-    // ================================================================
-    // UTILITARE
-    // ================================================================
     void DrawStat(float x, float y, float w, string label, string value,
                   Color valueColor, GUIStyle lblStyle, GUIStyle valStyle)
     {

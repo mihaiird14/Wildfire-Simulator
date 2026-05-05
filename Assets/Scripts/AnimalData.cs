@@ -1,19 +1,13 @@
 using UnityEngine;
 
-// ================================================================
-// AnimalData.cs
-// ================================================================
-// Defineste tipurile de animale si parametrii lor de comportament.
-// Fiecare tip are viteza, raza de detectie si reactie diferita.
-// ================================================================
 
 public enum AnimalType
 {
-    Deer,    // Cerb   - detecteaza de departe, fuge rapid si drept
-    Boar,    // Mistret - detecteaza tarziu, fuge haotic
-    Rabbit,  // Iepure  - detecteaza aproape, fuge rapid in zig-zag
-    Wolf,    // Lup     - detecteaza de departe, fuge organizat
-    Fox      // Vulpe   - comportament intermediar, inteligenta
+    Deer,    //  detecteaza de departe, fuge rapid si drept
+    Boar,    // - detecteaza tarziu, fuge haotic
+    Rabbit,  //  detecteaza aproape, fuge rapid in zig-zag
+    Wolf,    // - detecteaza de departe, fuge organizat
+    Fox      //   - comportament intermediar
 }
 
 public enum AnimalState
@@ -39,7 +33,6 @@ public struct AnimalStats
     public float staminaMax;        // cat timp poate fugi inainte sa oboseasca
     public float restTime;          // cat timp se odihneste
 
-    // Returneaza parametrii pentru fiecare tip de animal
     public static AnimalStats Get(AnimalType type)
     {
         return type switch

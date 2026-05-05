@@ -1,12 +1,5 @@
 using UnityEngine;
 using UnityEngine.AI;
-
-// ================================================================
-// AnimalAI.cs
-// ================================================================
-// Implementeaza un Decision Tree pentru comportamentul animalelor.
-//
-// Arborele de decizii evaluat la fiecare frame:
 //
 //   Animal mort?
 //   └── DA → ramane mort
@@ -17,7 +10,6 @@ using UnityEngine.AI;
 //                       └── NU → Sunt obosit?
 //                                 ├── DA → ODIHNA
 //                                 └── NU → RATACIRE aleatoare
-// ================================================================
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class AnimalAI : MonoBehaviour
@@ -48,10 +40,6 @@ public class AnimalAI : MonoBehaviour
 
     // Label vizual deasupra animalului
     private TextMesh _label;
-
-    // ================================================================
-    // INITIALIZARE
-    // ================================================================
     void Start()
     {
         _stats = AnimalStats.Get(animalType);
@@ -61,23 +49,15 @@ public class AnimalAI : MonoBehaviour
         _agent.speed = _stats.moveSpeed;
         _agent.acceleration = 20f;
         _agent.stoppingDistance = 0.5f;
-
-        // Cream label vizual deasupra animalului
         CreateLabel();
 
         // Prima destinatie aleatoare
         SetWanderDestination();
     }
-
-    // ================================================================
-    // UPDATE — evalueaza Decision Tree la fiecare frame
-    // ================================================================
     void Update()
     {
         if (_state == AnimalState.Dead) return;
 
-        // ── DECISION TREE ─────────────────────────────────────────
-        // Nodul 1: verifica proximitatea focului
         float distToFire = GetDistanceToNearestFire();
 
         if (distToFire < _stats.criticalRadius)
@@ -100,8 +80,6 @@ public class AnimalAI : MonoBehaviour
             // Totul e ok — ratacire normala
             EnterState(AnimalState.Wandering);
         }
-
-        // ── EXECUTAM COMPORTAMENTUL STARII CURENTE ────────────────
         switch (_state)
         {
             case AnimalState.Fleeing: ExecuteFlee(distToFire); break;
@@ -109,17 +87,12 @@ public class AnimalAI : MonoBehaviour
             case AnimalState.Resting: ExecuteRest(); break;
             case AnimalState.Wandering: ExecuteWander(); break;
         }
-
-        // ── VERIFICAM DACA ANIMALUL E PRINS DE FOC ────────────────
         CheckIfBurned();
 
         // Actualizam label-ul
         UpdateLabel();
     }
 
-    // ================================================================
-    // TRANZITII INTRE STARI
-    // ================================================================
     void EnterState(AnimalState newState)
     {
         if (_state == newState) return;
@@ -145,11 +118,6 @@ public class AnimalAI : MonoBehaviour
 
         _state = newState;
     }
-
-    // ================================================================
-    // COMPORTAMENT: FUGA ACTIVA
-    // Animal fuge cat mai departe de foc, cu zig-zag bazat pe tip
-    // ================================================================
     void ExecuteFlee(float distToFire)
     {
         // Consuma stamina la fuga
@@ -174,11 +142,6 @@ public class AnimalAI : MonoBehaviour
         if (NavMesh.SamplePosition(target, out hit, 10f, NavMesh.AllAreas))
             _agent.SetDestination(hit.position);
     }
-
-    // ================================================================
-    // COMPORTAMENT: EVITARE PREVENTIVA
-    // Animal se indeparteaza incet de foc inainte sa fie periculos
-    // ================================================================
     void ExecuteAvoid(float distToFire)
     {
         Vector3 firePos = GetNearestFirePosition();
@@ -193,11 +156,6 @@ public class AnimalAI : MonoBehaviour
                 _agent.SetDestination(hit.position);
         }
     }
-
-    // ================================================================
-    // COMPORTAMENT: ODIHNA
-    // Animal sta pe loc si isi reface stamina
-    // ================================================================
     void ExecuteRest()
     {
         _restTimer -= Time.deltaTime;
@@ -212,18 +170,12 @@ public class AnimalAI : MonoBehaviour
         }
     }
 
-    // ================================================================
-    // COMPORTAMENT: RATACIRE
-    // Animal se misca aleator pe teren cand nu e pericol
-    // ================================================================
     void ExecuteWander()
     {
         _stamina += Time.deltaTime * 0.5f;
         _stamina = Mathf.Min(_stamina, _stats.staminaMax);
 
         _wanderTimer -= Time.deltaTime;
-
-        // La fiecare 3-6 secunde alegem o noua destinatie aleatoare
         if (_wanderTimer <= 0f || !_agent.hasPath ||
             Vector3.Distance(transform.position, _agent.destination) < 1f)
         {
@@ -231,11 +183,6 @@ public class AnimalAI : MonoBehaviour
             _wanderTimer = Random.Range(3f, 6f);
         }
     }
-
-    // ================================================================
-    // VERIFICAM DACA ANIMALUL E PRINS DE FOC
-    // Daca celula pe care sta animalul arde, moare
-    // ================================================================
     void CheckIfBurned()
     {
         if (fireSimulator == null || fireSimulator.States == null) return;
@@ -255,9 +202,6 @@ public class AnimalAI : MonoBehaviour
         }
     }
 
-    // ================================================================
-    // MOARTE
-    // ================================================================
     void Die()
     {
         _state = AnimalState.Dead;
@@ -275,9 +219,6 @@ public class AnimalAI : MonoBehaviour
         Debug.Log("[AnimalAI] " + _stats.displayName + " a murit!");
     }
 
-    // ================================================================
-    // UTILITARE — gasim focul cel mai aproape
-    // ================================================================
     float GetDistanceToNearestFire()
     {
         if (fireSimulator == null || fireSimulator.States == null)

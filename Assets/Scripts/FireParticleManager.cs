@@ -38,7 +38,7 @@ public class FireParticleManager : MonoBehaviour
         List<Vector2Int> allBurning = new List<Vector2Int>();
         List<Vector2Int> toExtinguish = new List<Vector2Int>();
 
-        // 1. Verificăm starea fiecărei celule
+
         for (int z = 0; z < res; z++)
         {
             for (int x = 0; x < res; x++)
@@ -48,24 +48,23 @@ public class FireParticleManager : MonoBehaviour
 
                 if (state == CellState.Burning)
                 {
-                    // Adăugăm la lista de focuri active
+
                     allBurning.Add(cell);
                 }
                 else if (_fireObjects.ContainsKey(cell))
                 {
-                    // Dacă celula NU mai arde (ex: e Burned) dar are un obiect 3D, trebuie stins
+
                     toExtinguish.Add(cell);
                 }
             }
         }
 
-        // 2. Stingem focurile care și-au terminat ciclul
+
         foreach (var cell in toExtinguish)
         {
             StartCoroutine(ExtinguishFire(cell));
         }
 
-        // 3. Spawnăm foc pentru TOATE celulele care ard în simulare (FĂRĂ LIMITE)
         foreach (var cell in allBurning)
         {
             if (!_fireObjects.ContainsKey(cell))
@@ -155,8 +154,6 @@ public class FireParticleManager : MonoBehaviour
         fireR.material = CreateFireMaterial();
         fireR.renderMode = ParticleSystemRenderMode.Billboard;
 
-        // ── FUM ───────────────────────────────────────────────────
-        // ── FUM ───────────────────────────────────────────────────
         GameObject smokeGO = new GameObject("Smoke");
         smokeGO.transform.parent = fireObj.transform;
         smokeGO.transform.localPosition = new Vector3(0, cellSize * 0.8f, 0);
@@ -220,7 +217,6 @@ public class FireParticleManager : MonoBehaviour
         smR.renderMode = ParticleSystemRenderMode.Billboard;
         smR.renderMode = ParticleSystemRenderMode.Billboard;
 
-        // ── SCANTEI ───────────────────────────────────────────────
         GameObject sparkGO = new GameObject("Sparks");
         sparkGO.transform.parent = fireObj.transform;
         sparkGO.transform.localPosition = Vector3.zero;

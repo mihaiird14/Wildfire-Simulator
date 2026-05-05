@@ -1,14 +1,5 @@
 using UnityEngine;
 
-// ================================================================
-// BurnedTerrainPainter.cs
-// ================================================================
-// Cand o celula devine Burned, coloreaza zona corespunzatoare
-// pe terenul 3D cu o textura de pamant ars (negru/maro inchis).
-// Foloseste alphamap-ul terenului — acelasi sistem cu care
-// TerrainGenerator a aplicat texturile de vegetatie.
-// ================================================================
-
 public class BurnedTerrainPainter : MonoBehaviour
 {
     public FireSimulator fireSimulator;
@@ -96,9 +87,7 @@ public class BurnedTerrainPainter : MonoBehaviour
         UpdateBurnedAreas();
     }
 
-    // ================================================================
-    // ACTUALIZEAZA ZONELE ARSE PE TEREN
-    // ================================================================
+
     void UpdateBurnedAreas()
     {
         int res = fireSimulator.States.GetLength(0);
@@ -142,10 +131,7 @@ public class BurnedTerrainPainter : MonoBehaviour
             _terrainData.SetAlphamaps(0, 0, _alphamap);
     }
 
-    // ================================================================
-    // PICTEAZA UN PIXEL CA ARS
-    // Reduce toate celelalte layere proportional si creste layerul ars
-    // ================================================================
+
     void PaintBurned(int x, int z, float burnAmount)
     {
         int numLayers = _alphamap.GetLength(2);
@@ -176,19 +162,17 @@ public class BurnedTerrainPainter : MonoBehaviour
         }
     }
 
-    // ================================================================
-    // RESETEAZA TERENUL LA STAREA INITIALA
-    // ================================================================
+
     public void ResetBurnedTerrain()
     {
         if (!_initialized) return;
 
-        // Setam layerul ars la 0 peste tot
+
         for (int z = 0; z < _alphaRes; z++)
             for (int x = 0; x < _alphaRes; x++)
                 _alphamap[z, x, _burnedLayerIndex] = 0f;
 
-        // Refacem distributia initiala a celorlalte layere
+
         int numLayers = _alphamap.GetLength(2);
         for (int z = 0; z < _alphaRes; z++)
         {
