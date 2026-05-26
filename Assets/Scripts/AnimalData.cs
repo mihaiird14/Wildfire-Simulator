@@ -1,13 +1,14 @@
 using UnityEngine;
 
-
 public enum AnimalType
 {
     Deer,    //  detecteaza de departe, fuge rapid si drept
     Boar,    // - detecteaza tarziu, fuge haotic
     Rabbit,  //  detecteaza aproape, fuge rapid in zig-zag
     Wolf,    // - detecteaza de departe, fuge organizat
-    Fox      //   - comportament intermediar
+    Fox,     //   - comportament intermediar
+    Bear,
+    Lynx
 }
 
 public enum AnimalState
@@ -96,6 +97,30 @@ public struct AnimalStats
                 zigzagIntensity = 0.4f,
                 staminaMax = 12f,
                 restTime = 3f
+            },
+            AnimalType.Bear => new AnimalStats
+            {
+                type = AnimalType.Bear,
+                displayName = "Urs",
+                detectionRadius = 18f,
+                criticalRadius = 9f,
+                moveSpeed = 3.5f,
+                fleeSpeed = 8f,
+                zigzagIntensity = 0.15f,
+                staminaMax = 40f, // Stamina actualizata
+                restTime = 4f
+            },
+            AnimalType.Lynx => new AnimalStats
+            {
+                type = AnimalType.Lynx,
+                displayName = "Ras",
+                detectionRadius = 28f,
+                criticalRadius = 14f,
+                moveSpeed = 5f,
+                fleeSpeed = 13f,
+                zigzagIntensity = 0.5f,
+                staminaMax = 15f, // Stamina actualizata
+                restTime = 2.5f
             },
             _ => default
         };

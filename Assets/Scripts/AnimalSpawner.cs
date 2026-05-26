@@ -16,7 +16,7 @@ public class AnimalSpawner : MonoBehaviour
     public TerrainGenerator terrainGen;
 
     [Header("Configuratie spawn")]
-    public int totalAnimals = 8;
+    public int totalAnimals = 10; // Am marit la 10 pentru a asigura spawn-ul noilor animale
 
     // Prefab-urile pentru fiecare tip — lasa goale si vor fi create automat
     // ca primitive colorate diferit
@@ -26,6 +26,8 @@ public class AnimalSpawner : MonoBehaviour
     public GameObject rabbitPrefab;
     public GameObject wolfPrefab;
     public GameObject foxPrefab;
+    public GameObject bearPrefab;
+    public GameObject lynxPrefab;
 
     // Lista cu toate animalele din scena
     private List<AnimalAI> _animals = new List<AnimalAI>();
@@ -36,7 +38,9 @@ public class AnimalSpawner : MonoBehaviour
         new Color(0.3f, 0.2f, 0.1f),  // Mistret - maro inchis
         new Color(0.9f, 0.8f, 0.7f),  // Iepure - crem
         new Color(0.2f, 0.2f, 0.2f),  // Lup - gri inchis
-        new Color(0.8f, 0.4f, 0.1f)   // Vulpe - portocaliu
+        new Color(0.8f, 0.4f, 0.1f),  // Vulpe - portocaliu
+        new Color(0.2f, 0.1f, 0.05f), // Urs - maro foarte inchis
+        new Color(0.7f, 0.6f, 0.4f)   // Ras - bej/galbui
     };
 
     void Start()
@@ -47,13 +51,15 @@ public class AnimalSpawner : MonoBehaviour
 
     void SpawnAnimals()
     {
-        // Distributie de animale: 2 cerbi, 2 mistreti, 2 iepuri, 1 lup, 1 vulpe
+        // Distributie de animale: 2 cerbi, 2 mistreti, 2 iepuri, 1 lup, 1 vulpe, 1 urs, 1 ras
         AnimalType[] types = {
             AnimalType.Deer,   AnimalType.Deer,
             AnimalType.Boar,   AnimalType.Boar,
             AnimalType.Rabbit, AnimalType.Rabbit,
             AnimalType.Wolf,
-            AnimalType.Fox
+            AnimalType.Fox,
+            AnimalType.Bear,
+            AnimalType.Lynx
         };
 
         int spawned = 0;
@@ -113,6 +119,8 @@ public class AnimalSpawner : MonoBehaviour
             AnimalType.Rabbit => rabbitPrefab,
             AnimalType.Wolf => wolfPrefab,
             AnimalType.Fox => foxPrefab,
+            AnimalType.Bear => bearPrefab, 
+            AnimalType.Lynx => lynxPrefab, 
             _ => null
         };
 
@@ -164,6 +172,8 @@ public class AnimalSpawner : MonoBehaviour
             AnimalType.Rabbit => new Vector3(0.25f, 0.3f, 0.25f),
             AnimalType.Wolf => new Vector3(0.55f, 0.6f, 0.55f),
             AnimalType.Fox => new Vector3(0.35f, 0.45f, 0.35f),
+            AnimalType.Bear => new Vector3(0.8f, 0.9f, 0.8f), // Marime personalizata pt Urs
+            AnimalType.Lynx => new Vector3(0.4f, 0.5f, 0.4f), // Marime personalizata pt Ras
             _ => Vector3.one * 0.5f
         };
     }
